@@ -7,7 +7,8 @@ from django.db.models.signals import (
     post_save,
     pre_save,
     pre_delete,
-    post_delete
+    post_delete,
+    m2m_changed,
 )
 from django.utils import timezone
 User = settings.AUTH_USER_MODEL
@@ -70,3 +71,18 @@ def blog_post_save(sender, instance, created, *args, **kwargs):
         # celery worker task
         instance.notify_users_timestamp = timezone.now()
         instance.save()
+
+# Deleting...
+
+
+@receiver(pre_delete, sender=BlogPost)
+def blog_pre_delete(sender, instance, *args, **kwargs):
+    # Move or make a backup of this data
+    print(f"{instance.id} will be removed.")
+
+
+@receiver(post_delete, sender=BlogPost)
+def blog_post_delete(sender, instance, created, *args, **kwargs):
+    print(f"{instance.id} has been removed.")
+
+# Many to Many changed
