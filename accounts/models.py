@@ -86,3 +86,12 @@ def blog_post_delete(sender, instance, created, *args, **kwargs):
     print(f"{instance.id} has been removed.")
 
 # Many to Many changed
+
+
+@receiver(m2m_changed, sender=BlogPost.liked.through)
+def blog_post_liked_changed(sender, instance, action, *args, **kwargs):
+    print(args, kwargs)
+    if action == "pre_add":
+        print("was added")
+        qs = kwargs.get("model").objects.filter(pk__in=kwargs.get('pk_set'))
+        print(qs.count())
